@@ -9,6 +9,8 @@ export type FoodItem = {
   nameZh: string;
   amount: number | null;
   unit: FoodUnit;
+  /** Grams per unit (个/片/碗/份) or g per ml. Optional for legacy rows. */
+  unitWeightGrams?: number | null;
   weightGrams: number | null;
   calories: number | null;
   protein: number | null;

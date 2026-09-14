@@ -6,6 +6,8 @@ export type NutritionSearchItem = {
   proteinPer100g: number;
   carbsPer100g: number;
   fatPer100g: number;
+  /** Reliable household/serving grams from USDA when available. */
+  servingGrams?: number | null;
 };
 
 export function nutritionFromGrams(per100g: number, weightGrams: number): number {

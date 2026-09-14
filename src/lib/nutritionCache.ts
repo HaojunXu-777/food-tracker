@@ -41,6 +41,7 @@ function toSearchItem(row: NutritionCacheEntry): NutritionSearchItem {
     proteinPer100g: row.proteinPer100g,
     carbsPer100g: row.carbsPer100g,
     fatPer100g: row.fatPer100g,
+    servingGrams: row.servingGrams ?? null,
   };
 }
 
@@ -54,6 +55,7 @@ function toCacheEntry(query: string, item: NutritionSearchItem): NutritionCacheE
     proteinPer100g: item.proteinPer100g,
     carbsPer100g: item.carbsPer100g,
     fatPer100g: item.fatPer100g,
+    servingGrams: item.servingGrams ?? null,
     queriedAt: Date.now(),
   };
 }

@@ -7,5 +7,7 @@ export type NutritionCacheEntry = {
   proteinPer100g: number;
   carbsPer100g: number;
   fatPer100g: number;
+  /** Optional; absent on older cache rows. */
+  servingGrams?: number | null;
   queriedAt: number;
 };

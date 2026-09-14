@@ -18,6 +18,13 @@ import {
 } from "@/lib/nutritionCache";
 import { getPhotosByMealId, reassignPhotos } from "@/lib/photoStore";
 import type { FoodItem, FoodUnit, MealEntry, MealType, NutritionSource } from "@/lib/types";
+import {
+  computeWeightGrams,
+  defaultUnitWeightGrams,
+  inferUnitWeightGrams,
+  needsUnitWeight,
+  unitWeightLabel,
+} from "@/lib/unitWeight";
 
 type AiFoodSeed = {
   nameZh: string;
@@ -38,6 +45,7 @@ type FoodDraft = {
   nameZh: string;
   amount: string;
   unit: FoodUnit;
+  unitWeightGrams: string;
   weightGrams: string;
   calories: string;
   protein: string;
@@ -48,6 +56,7 @@ type FoodDraft = {
   proteinPer100g: number | null;
   carbsPer100g: number | null;
   fatPer100g: number | null;
+  usdaServingGrams: number | null;
 };
 
 function emptyFood(): FoodDraft {
@@ -56,6 +65,7 @@ function emptyFood(): FoodDraft {
     nameZh: "",
     amount: "",
     unit: "g",
+    unitWeightGrams: "",
     weightGrams: "",
     calories: "",
     protein: "",
@@ -66,25 +76,7 @@ function emptyFood(): FoodDraft {
     proteinPer100g: null,
     carbsPer100g: null,
     fatPer100g: null,
-  };
-}
-
-function fromFoodItem(food: FoodItem): FoodDraft {
-  return {
-    key: food.id,
-    nameZh: food.nameZh,
-    amount: food.amount == null ? "" : String(food.amount),
-    unit: food.unit,
-    weightGrams: food.weightGrams == null ? "" : String(food.weightGrams),
-    calories: food.calories == null ? "" : String(food.calories),
-    protein: food.protein == null ? "" : String(food.protein),
-    carbs: food.carbs == null ? "" : String(food.carbs),
-    fat: food.fat == null ? "" : String(food.fat),
-    nutritionSource: food.nutritionSource,
-    caloriesPer100g: null,
-    proteinPer100g: null,
-    carbsPer100g: null,
-    fatPer100g: null,
+    usdaServingGrams: null,
   };
 }
 
@@ -95,12 +87,80 @@ function parseNumber(value: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function formatNumber(value: number | null): string {
+  if (value == null) return "";
+  return String(value);
+}
+
+function applyPer100Nutrition(food: FoodDraft, weight: number | null): FoodDraft {
+  if (
+    food.nutritionSource !== "usda" ||
+    food.caloriesPer100g == null ||
+    weight == null
+  ) {
+    return food;
+  }
+  return {
+    ...food,
+    calories: String(nutritionFromGrams(food.caloriesPer100g, weight)),
+    protein: String(nutritionFromGrams(food.proteinPer100g ?? 0, weight)),
+    carbs: String(nutritionFromGrams(food.carbsPer100g ?? 0, weight)),
+    fat: String(nutritionFromGrams(food.fatPer100g ?? 0, weight)),
+  };
+}
+
+function withComputedWeight(food: FoodDraft): FoodDraft {
+  const amount = parseNumber(food.amount);
+  const unitWeight = needsUnitWeight(food.unit)
+    ? parseNumber(food.unitWeightGrams)
+    : null;
+  const weight = computeWeightGrams(amount, food.unit, unitWeight);
+  const next: FoodDraft = {
+    ...food,
+    weightGrams: formatNumber(weight),
+    ...(food.unit === "g" && amount != null
+      ? { amount: formatNumber(weight ?? amount) }
+      : {}),
+  };
+  return applyPer100Nutrition(next, weight);
+}
+
+function fromFoodItem(food: FoodItem): FoodDraft {
+  const inferred = inferUnitWeightGrams(
+    food.amount,
+    food.unit,
+    food.weightGrams,
+    food.unitWeightGrams,
+  );
+  return {
+    key: food.id,
+    nameZh: food.nameZh,
+    amount: food.amount == null ? "" : String(food.amount),
+    unit: food.unit,
+    unitWeightGrams: inferred == null ? "" : String(inferred),
+    weightGrams: food.weightGrams == null ? "" : String(food.weightGrams),
+    calories: food.calories == null ? "" : String(food.calories),
+    protein: food.protein == null ? "" : String(food.protein),
+    carbs: food.carbs == null ? "" : String(food.carbs),
+    fat: food.fat == null ? "" : String(food.fat),
+    nutritionSource: food.nutritionSource,
+    caloriesPer100g: null,
+    proteinPer100g: null,
+    carbsPer100g: null,
+    fatPer100g: null,
+    usdaServingGrams: null,
+  };
+}
+
 function toFoodItem(draft: FoodDraft): FoodItem {
   return {
     id: draft.key,
     nameZh: draft.nameZh.trim(),
     amount: parseNumber(draft.amount),
     unit: draft.unit,
+    unitWeightGrams: needsUnitWeight(draft.unit)
+      ? parseNumber(draft.unitWeightGrams)
+      : null,
     weightGrams: parseNumber(draft.weightGrams),
     calories: parseNumber(draft.calories),
     protein: parseNumber(draft.protein),
@@ -116,6 +176,7 @@ function fromSearchItem(item: NutritionSearchItem): FoodDraft {
     nameZh: item.nameZh,
     amount: "100",
     unit: "g",
+    unitWeightGrams: "",
     weightGrams: "100",
     calories: String(item.caloriesPer100g),
     protein: String(item.proteinPer100g),
@@ -126,6 +187,7 @@ function fromSearchItem(item: NutritionSearchItem): FoodDraft {
     proteinPer100g: item.proteinPer100g,
     carbsPer100g: item.carbsPer100g,
     fatPer100g: item.fatPer100g,
+    usdaServingGrams: item.servingGrams ?? null,
   };
 }
 
@@ -181,39 +243,67 @@ export function ManualMealForm({
 
   const totals = sumFoods(foods.map(toFoodItem));
 
-  function updateFood(index: number, patch: Partial<FoodDraft>) {
-    setFoods((current) =>
-      current.map((food, i) => (i === index ? { ...food, ...patch } : food)),
-    );
-  }
-
-  function applyUsdaWeight(index: number, weightText: string) {
+  function patchFood(index: number, patch: Partial<FoodDraft>) {
     setFoods((current) =>
       current.map((food, i) => {
         if (i !== index) return food;
-        const weight = parseNumber(weightText);
-        if (
-          food.nutritionSource !== "usda" ||
-          food.caloriesPer100g == null ||
-          weight == null
-        ) {
-          return { ...food, weightGrams: weightText };
+
+        let next: FoodDraft = { ...food, ...patch };
+
+        if (patch.unit != null && patch.unit !== food.unit) {
+          if (needsUnitWeight(patch.unit)) {
+            next.unitWeightGrams = formatNumber(
+              defaultUnitWeightGrams(patch.unit, food.usdaServingGrams),
+            );
+            // Leaving grams: amount was grams, reset to 1 unit.
+            if (!needsUnitWeight(food.unit) || next.amount.trim() === "") {
+              next.amount = "1";
+            }
+            next = withComputedWeight(next);
+          } else {
+            // switching to g: amount becomes weightGrams
+            const weight =
+              parseNumber(food.weightGrams) ?? parseNumber(food.amount);
+            next.unitWeightGrams = "";
+            next.amount = formatNumber(weight);
+            next.weightGrams = formatNumber(weight);
+            next = applyPer100Nutrition(next, weight);
+          }
+          return next;
         }
-        return {
-          ...food,
-          weightGrams: weightText,
-          amount: food.unit === "g" ? weightText : food.amount,
-          calories: String(nutritionFromGrams(food.caloriesPer100g, weight)),
-          protein: String(nutritionFromGrams(food.proteinPer100g ?? 0, weight)),
-          carbs: String(nutritionFromGrams(food.carbsPer100g ?? 0, weight)),
-          fat: String(nutritionFromGrams(food.fatPer100g ?? 0, weight)),
-        };
+
+        if (patch.amount != null || patch.unitWeightGrams != null) {
+          if (next.unit === "g" && patch.amount != null) {
+            const weight = parseNumber(patch.amount);
+            next.weightGrams = formatNumber(weight);
+            return applyPer100Nutrition(next, weight);
+          }
+          return withComputedWeight(next);
+        }
+
+        if (patch.weightGrams != null) {
+          const weight = parseNumber(patch.weightGrams);
+          if (next.unit === "g") {
+            next.amount = patch.weightGrams;
+          }
+          return applyPer100Nutrition(next, weight);
+        }
+
+        return next;
       }),
     );
   }
 
+  function updateFood(index: number, patch: Partial<FoodDraft>) {
+    patchFood(index, patch);
+  }
+
+  function applyUsdaWeight(index: number, weightText: string) {
+    patchFood(index, { weightGrams: weightText });
+  }
+
   function editNutrition(index: number, patch: Partial<FoodDraft>) {
-    updateFood(index, {
+    patchFood(index, {
       ...patch,
       nutritionSource: "manual",
       caloriesPer100g: null,
@@ -492,6 +582,23 @@ export function ManualMealForm({
                 </select>
               </label>
             </div>
+
+            {needsUnitWeight(food.unit) ? (
+              <label className="mt-3 block text-sm">
+                {unitWeightLabel(food.unit)}
+                <div className="mt-1 flex items-center gap-2">
+                  <input
+                    className="w-full rounded-lg border border-[var(--line)] px-3 py-2"
+                    inputMode="decimal"
+                    value={food.unitWeightGrams}
+                    onChange={(e) =>
+                      updateFood(index, { unitWeightGrams: e.target.value })
+                    }
+                  />
+                  <span className="shrink-0 text-[var(--muted)]">g</span>
+                </div>
+              </label>
+            ) : null}
 
             <label className="mt-3 block text-sm">
               克数 weightGrams

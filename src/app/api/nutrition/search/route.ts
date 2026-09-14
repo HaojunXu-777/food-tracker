@@ -56,6 +56,7 @@ export async function GET(request: Request) {
         proteinPer100g: parsed.proteinPer100g,
         carbsPer100g: parsed.carbsPer100g,
         fatPer100g: parsed.fatPer100g,
+        servingGrams: parsed.servingGrams,
       });
       if (items.length >= 8) break;
     }

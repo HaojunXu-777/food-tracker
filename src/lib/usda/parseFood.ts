@@ -6,11 +6,60 @@ type UsdaNutrient = {
   value?: number;
 };
 
+type UsdaFoodPortion = {
+  gramWeight?: number;
+  amount?: number;
+};
+
 type UsdaFood = {
   fdcId?: number;
   description?: string;
   foodNutrients?: UsdaNutrient[];
+  servingSize?: number;
+  servingSizeUnit?: string;
+  foodPortions?: UsdaFoodPortion[];
 };
+
+/** Only accept clear gram-based serving sizes; never invent values. */
+function extractServingGrams(food: UsdaFood): number | null {
+  const portions = food.foodPortions ?? [];
+  const single = portions.find(
+    (p) =>
+      p.amount === 1 &&
+      typeof p.gramWeight === "number" &&
+      Number.isFinite(p.gramWeight) &&
+      p.gramWeight >= 1 &&
+      p.gramWeight <= 1000,
+  );
+  if (single?.gramWeight != null) {
+    return Math.round(single.gramWeight);
+  }
+  const first = portions.find(
+    (p) =>
+      typeof p.gramWeight === "number" &&
+      Number.isFinite(p.gramWeight) &&
+      p.gramWeight >= 1 &&
+      p.gramWeight <= 1000,
+  );
+  if (first?.gramWeight != null) {
+    return Math.round(first.gramWeight);
+  }
+
+  const size = food.servingSize;
+  const unit = (food.servingSizeUnit ?? "").toLowerCase();
+  const isGram =
+    unit === "g" || unit === "grm" || unit === "gram" || unit === "grams";
+  if (
+    isGram &&
+    typeof size === "number" &&
+    Number.isFinite(size) &&
+    size >= 1 &&
+    size <= 1000
+  ) {
+    return Math.round(size);
+  }
+  return null;
+}
 
 const ENERGY_IDS = new Set([1008, 2047, 2048, 208]);
 const PROTEIN_IDS = new Set([1003, 203]);
@@ -44,6 +93,7 @@ export function parseUsdaFood(food: UsdaFood): {
   proteinPer100g: number;
   carbsPer100g: number;
   fatPer100g: number;
+  servingGrams: number | null;
 } | null {
   const nutrients = food.foodNutrients ?? [];
   const calories =
@@ -64,5 +114,6 @@ export function parseUsdaFood(food: UsdaFood): {
     proteinPer100g: Math.round(protein ?? 0),
     carbsPer100g: Math.round(carbs ?? 0),
     fatPer100g: Math.round(fat ?? 0),
+    servingGrams: extractServingGrams(food),
   };
 }
