@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { notFound, useParams } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { PhotoEditor } from "@/components/diet/PhotoEditor";
+import { AI_FEATURES_ENABLED } from "@/lib/ai/features";
 import { blobToDataUrl } from "@/lib/image/compress";
 import { isMealType, mealTypeLabel } from "@/lib/meals";
 import { getPhotosByMealId } from "@/lib/photoStore";
@@ -25,6 +26,10 @@ export default function PhotoRecordPage() {
   }
 
   async function analyze() {
+    if (!AI_FEATURES_ENABLED) {
+      setError("AI 识别暂未启用。请改为手动添加");
+      return;
+    }
     setError("");
     const photos = await getPhotosByMealId(mealKey);
     if (photos.length === 0) {
@@ -71,14 +76,27 @@ export default function PhotoRecordPage() {
       <div className="px-2 pt-4 pb-8">
         <PhotoEditor mealKey={mealKey} onChange={(ids) => { countRef.current = ids.length; }} />
         {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-        <button
-          type="button"
-          disabled={analyzing}
-          className="mt-4 w-full rounded-xl bg-[var(--accent)] py-3 text-white disabled:opacity-60"
-          onClick={() => void analyze()}
-        >
-          {analyzing ? "AI 分析中…" : "开始 AI 识别"}
-        </button>
+        {!AI_FEATURES_ENABLED ? (
+          <button
+            type="button"
+            disabled
+            className="mt-4 w-full rounded-xl border border-[var(--line)] py-3 text-[var(--muted)]"
+          >
+            AI 识别（暂未启用）
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={analyzing}
+            className="mt-4 w-full rounded-xl bg-[var(--accent)] py-3 text-white disabled:opacity-60"
+            onClick={() => void analyze()}
+          >
+            {analyzing ? "AI 分析中…" : "开始 AI 识别"}
+          </button>
+        )}
+        <p className="mt-2 text-center text-sm text-[var(--muted)]">
+          可拍照保存，再用手动添加填写食物与营养
+        </p>
         <Link
           href={`/diet/${mealType}/manual`}
           className="mt-3 block w-full py-3 text-center text-sm text-[var(--muted)]"

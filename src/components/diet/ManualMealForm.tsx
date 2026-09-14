@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { PhotoEditor } from "@/components/diet/PhotoEditor";
+import { AI_FEATURES_ENABLED } from "@/lib/ai/features";
 import { addMeal, getMeal, updateMeal } from "@/lib/mealStore";
 import { todayDate } from "@/lib/date";
 import { blobToDataUrl } from "@/lib/image/compress";
@@ -283,6 +284,10 @@ export function ManualMealForm({
   }
 
   async function estimateWeight(index: number) {
+    if (!AI_FEATURES_ENABLED) {
+      setError("AI 估重暂未启用，请手动填写克数");
+      return;
+    }
     const food = foods[index];
     if (!food?.nameZh.trim()) {
       setError("请先填写食物名称");
@@ -500,11 +505,18 @@ export function ManualMealForm({
             {enableEstimateWeight ? (
               <button
                 type="button"
-                className="mt-2 w-full rounded-lg border border-[var(--line)] py-2 text-sm"
-                disabled={estimatingIndex === index}
-                onClick={() => void estimateWeight(index)}
+                className="mt-2 w-full rounded-lg border border-[var(--line)] py-2 text-sm text-[var(--muted)] disabled:opacity-60"
+                disabled={!AI_FEATURES_ENABLED || estimatingIndex === index}
+                onClick={() => {
+                  if (!AI_FEATURES_ENABLED) return;
+                  void estimateWeight(index);
+                }}
               >
-                {estimatingIndex === index ? "估算中…" : "AI估算重量"}
+                {!AI_FEATURES_ENABLED
+                  ? "AI估算重量（暂未启用）"
+                  : estimatingIndex === index
+                    ? "估算中…"
+                    : "AI估算重量"}
               </button>
             ) : null}
 
