@@ -58,17 +58,23 @@ function ConfirmMealInner() {
   }
 
   if (!draft) {
-    return <p className="px-4 pt-8 text-sm">缺少照片草稿，请返回重新拍照。</p>;
+    return (
+      <p className="ft-page px-4 pt-8 text-sm">缺少照片草稿，请返回重新拍照。</p>
+    );
   }
 
   if (foods === null) {
-    return <p className="px-4 pt-8 text-sm text-[var(--muted)]">正在匹配营养数据…</p>;
+    return (
+      <p className="ft-page px-4 pt-8 text-sm text-[var(--muted)]">
+        正在匹配营养数据…
+      </p>
+    );
   }
 
   return (
-    <div>
+    <div className="ft-page">
       <PageHeader title={`确认${mealTypeLabel(mealType)}`} backHref={`/diet/${mealType}/photo`} />
-      <p className="px-4 pt-2 text-sm text-[var(--muted)]">
+      <p className="px-4 pt-1 text-sm text-[var(--muted)]">
         AI 已识别 {foods.length} 种食物
       </p>
       <ManualMealForm

@@ -71,16 +71,18 @@ export default function PhotoRecordPage() {
   }
 
   return (
-    <div className="px-2">
+    <div className="ft-page px-2 pb-6">
       <PageHeader title={`${mealTypeLabel(mealType)}照片`} backHref={`/diet/${mealType}`} />
-      <div className="px-2 pt-4 pb-8">
-        <PhotoEditor mealKey={mealKey} onChange={(ids) => { countRef.current = ids.length; }} />
-        {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+      <div className="px-3 pt-2 pb-8">
+        <div className="ft-card p-4">
+          <PhotoEditor mealKey={mealKey} onChange={(ids) => { countRef.current = ids.length; }} />
+        </div>
+        {error ? <p className="mt-3 text-sm text-red-500">{error}</p> : null}
         {!AI_FEATURES_ENABLED ? (
           <button
             type="button"
             disabled
-            className="mt-4 w-full rounded-xl border border-[var(--line)] py-3 text-[var(--muted)]"
+            className="mt-4 w-full rounded-[1rem] bg-[var(--input-bg)] py-3.5 font-medium text-[var(--muted)]"
           >
             AI 识别（暂未启用）
           </button>
@@ -88,18 +90,18 @@ export default function PhotoRecordPage() {
           <button
             type="button"
             disabled={analyzing}
-            className="mt-4 w-full rounded-xl bg-[var(--accent)] py-3 text-white disabled:opacity-60"
+            className="ft-btn-primary mt-4"
             onClick={() => void analyze()}
           >
             {analyzing ? "AI 分析中…" : "开始 AI 识别"}
           </button>
         )}
-        <p className="mt-2 text-center text-sm text-[var(--muted)]">
+        <p className="mt-3 text-center text-sm text-[var(--muted)]">
           可拍照保存，再用手动添加填写食物与营养
         </p>
         <Link
           href={`/diet/${mealType}/manual`}
-          className="mt-3 block w-full py-3 text-center text-sm text-[var(--muted)]"
+          className="mt-2 block w-full py-3 text-center text-sm font-semibold text-[var(--accent-violet)]"
         >
           改为手动添加
         </Link>

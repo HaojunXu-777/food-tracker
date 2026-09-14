@@ -477,9 +477,9 @@ export function ManualMealForm({
         <PhotoEditor mealKey={photoKey} />
       </div>
 
-      <div className="flex gap-2">
+      <div className="ft-card-soft flex gap-2 p-2">
         <input
-          className="flex-1 rounded-lg border border-[var(--line)] px-3 py-2"
+          className="ft-input flex-1"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => {
@@ -492,7 +492,7 @@ export function ManualMealForm({
         />
         <button
           type="button"
-          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm text-white"
+          className="shrink-0 rounded-2xl bg-[var(--accent-cyan)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(46,196,182,0.35)]"
           onClick={() => void handleSearch()}
           disabled={searching}
         >
@@ -503,7 +503,7 @@ export function ManualMealForm({
       {searching ? (
         <p className="mt-3 text-sm text-[var(--muted)]">搜索中…</p>
       ) : null}
-      {searchError ? <p className="mt-3 text-sm text-red-600">{searchError}</p> : null}
+      {searchError ? <p className="mt-3 text-sm text-red-500">{searchError}</p> : null}
       {searchEmpty ? (
         <p className="mt-3 text-sm text-[var(--muted)]">没有找到匹配的食物</p>
       ) : null}
@@ -512,25 +512,28 @@ export function ManualMealForm({
       ) : null}
 
       {results.length > 0 ? (
-        <div className="mt-3 space-y-2">
-          <p className="text-sm">搜索结果</p>
+        <div className="mt-4 space-y-2.5">
+          <p className="text-sm font-semibold">搜索结果</p>
           {results.map((item) => (
             <div
               key={`${item.fdcId ?? item.nameZh}-${item.caloriesPer100g}`}
-              className="flex items-center justify-between rounded-xl border border-[var(--line)] px-4 py-3"
+              className="ft-card-soft flex items-center justify-between gap-3 px-4 py-3.5"
             >
-              <div>
-                <p className="font-medium">{item.nameZh}</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">
-                  {item.caloriesPer100g} kcal / 100g
+              <div className="min-w-0">
+                <p className="font-semibold">{item.nameZh}</p>
+                <p className="ft-num mt-1 text-base font-bold text-[var(--accent-cyan)]">
+                  {item.caloriesPer100g}
+                  <span className="ml-1 text-xs font-medium text-[var(--muted)]">
+                    kcal / 100g
+                  </span>
                 </p>
-                <p className="text-sm text-[var(--muted)]">
-                  蛋白质 {item.proteinPer100g}g  碳水 {item.carbsPer100g}g  脂肪 {item.fatPer100g}g
+                <p className="mt-1 text-xs text-[var(--muted)]">
+                  P {item.proteinPer100g}g · C {item.carbsPer100g}g · F {item.fatPer100g}g
                 </p>
               </div>
               <button
                 type="button"
-                className="px-2 text-lg"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-pink)] text-white shadow-[0_6px_14px_rgba(240,115,168,0.35)]"
                 onClick={() => void addFromSearch(item)}
                 aria-label="添加"
               >
@@ -541,14 +544,14 @@ export function ManualMealForm({
         </div>
       ) : null}
 
-      <p className="mt-6 text-sm">已添加</p>
-      <div className="mt-3 space-y-4">
+      <p className="mt-6 text-sm font-semibold">已添加</p>
+      <div className="mt-3 space-y-3">
         {foods.map((food, index) => (
-          <article key={food.key} className="rounded-xl border border-[var(--line)] p-4">
-            <label className="block text-sm">
+          <article key={food.key} className="ft-card p-4">
+            <label className="block text-sm font-medium">
               食物名称
               <input
-                className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
+                className="ft-input mt-1.5"
                 value={food.nameZh}
                 onChange={(e) => updateFood(index, { nameZh: e.target.value })}
                 placeholder="例如：鸡胸肉"
@@ -556,19 +559,19 @@ export function ManualMealForm({
             </label>
 
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <label className="block text-sm">
+              <label className="block text-sm font-medium">
                 数量
                 <input
-                  className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
+                  className="ft-input mt-1.5 font-semibold"
                   inputMode="decimal"
                   value={food.amount}
                   onChange={(e) => updateFood(index, { amount: e.target.value })}
                 />
               </label>
-              <label className="block text-sm">
+              <label className="block text-sm font-medium">
                 单位
                 <select
-                  className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
+                  className="ft-input mt-1.5"
                   value={food.unit}
                   onChange={(e) =>
                     updateFood(index, { unit: e.target.value as FoodUnit })
@@ -584,11 +587,11 @@ export function ManualMealForm({
             </div>
 
             {needsUnitWeight(food.unit) ? (
-              <label className="mt-3 block text-sm">
+              <label className="mt-3 block text-sm font-medium">
                 {unitWeightLabel(food.unit)}
-                <div className="mt-1 flex items-center gap-2">
+                <div className="mt-1.5 flex items-center gap-2">
                   <input
-                    className="w-full rounded-lg border border-[var(--line)] px-3 py-2"
+                    className="ft-input font-semibold"
                     inputMode="decimal"
                     value={food.unitWeightGrams}
                     onChange={(e) =>
@@ -600,10 +603,10 @@ export function ManualMealForm({
               </label>
             ) : null}
 
-            <label className="mt-3 block text-sm">
-              克数 weightGrams
+            <label className="mt-3 block text-sm font-medium">
+              克数
               <input
-                className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
+                className="ft-input mt-1.5 font-semibold text-[var(--accent-violet)]"
                 inputMode="decimal"
                 value={food.weightGrams}
                 onChange={(e) => applyUsdaWeight(index, e.target.value)}
@@ -612,7 +615,7 @@ export function ManualMealForm({
             {enableEstimateWeight ? (
               <button
                 type="button"
-                className="mt-2 w-full rounded-lg border border-[var(--line)] py-2 text-sm text-[var(--muted)] disabled:opacity-60"
+                className="mt-2 w-full rounded-2xl bg-[var(--input-bg)] py-2.5 text-sm text-[var(--muted)] disabled:opacity-60"
                 disabled={!AI_FEATURES_ENABLED || estimatingIndex === index}
                 onClick={() => {
                   if (!AI_FEATURES_ENABLED) return;
@@ -656,7 +659,7 @@ export function ManualMealForm({
 
             <button
               type="button"
-              className="mt-3 text-sm text-red-600"
+              className="mt-3 text-sm font-medium text-[var(--accent-pink)]"
               onClick={() => setDeleteIndex(index)}
             >
               删除
@@ -667,36 +670,42 @@ export function ManualMealForm({
 
       <button
         type="button"
-        className="mt-4 w-full py-3 text-center text-sm"
+        className="mt-4 w-full rounded-2xl border border-dashed border-[rgba(139,124,246,0.35)] py-3.5 text-center text-sm font-semibold text-[var(--accent-violet)]"
         onClick={() => setFoods((current) => [...current, emptyFood()])}
       >
         ＋ 添加食物
       </button>
 
-      <div className="mt-6 rounded-xl border border-[var(--line)] p-4">
-        <p className="font-medium">本餐合计</p>
-        <p className="mt-2">{roundNutrition(totals.calories)} kcal</p>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          蛋白质 {roundNutrition(totals.protein)}g  碳水 {roundNutrition(totals.carbs)}g  脂肪{" "}
-          {roundNutrition(totals.fat)}g
+      <div className="ft-card mt-6 p-4">
+        <p className="text-sm font-semibold text-[var(--muted)]">本餐合计</p>
+        <p className="ft-num mt-2 text-3xl font-bold">
+          {roundNutrition(totals.calories)}
+          <span className="ml-1 text-sm font-medium text-[var(--accent-cyan)]">kcal</span>
+        </p>
+        <p className="mt-2 text-sm text-[var(--muted)]">
+          <span style={{ color: "var(--protein)" }}>P</span> {roundNutrition(totals.protein)}g
+          {"  "}
+          <span style={{ color: "var(--carbs)" }}>C</span> {roundNutrition(totals.carbs)}g
+          {"  "}
+          <span style={{ color: "var(--fat)" }}>F</span> {roundNutrition(totals.fat)}g
         </p>
       </div>
 
-      <label className="mt-4 block text-sm">
+      <label className="mt-4 block text-sm font-medium">
         备注（可选）
         <input
-          className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
+          className="ft-input mt-1.5"
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
       </label>
 
-      {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="mt-3 text-sm text-red-500">{error}</p> : null}
 
       <button
         type="button"
         disabled={saving}
-        className="mt-4 w-full rounded-xl bg-[var(--accent)] py-3 text-white disabled:opacity-60"
+        className="ft-btn-primary mt-4"
         onClick={handleSave}
       >
         {saving ? "保存中…" : "保存"}
@@ -726,10 +735,10 @@ function NumberField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="block text-sm">
+    <label className="block text-sm font-medium">
       {label}
       <input
-        className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
+        className="ft-input mt-1.5 font-semibold"
         inputMode="decimal"
         value={value}
         onChange={(e) => onChange(e.target.value)}

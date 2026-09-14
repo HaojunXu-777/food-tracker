@@ -1,22 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f5f7;
-  --foreground: #111827;
+  /* Deep indigo / violet canvas */
+  --bg-deep: #1a1548;
+  --bg-deep-mid: #241b5e;
+  --bg-deep-soft: #2f246f;
+  --surface: #f3f1fa;
   --card: #ffffff;
-  --muted: #6b7280;
-  --line: #e5e7eb;
-  --accent: #111827;
-  --ring-track: #e5e7eb;
-  --ring-fill: #111827;
-  --bar-track: #e5e7eb;
-  --bar-fill: #111827;
+  --foreground: #1c1838;
+  --muted: #8a85a8;
+  --muted-soft: #b4afc9;
+  --line: rgba(28, 24, 56, 0.06);
+  --input-bg: #f5f3fb;
+
+  /* Accents */
+  --accent-cyan: #2ec4b6;
+  --accent-pink: #f073a8;
+  --accent-yellow: #f5c042;
+  --accent-violet: #8b7cf6;
+  --accent-orange: #f0a04b;
+
+  --accent: var(--accent-pink);
+  --accent-secondary: var(--accent-cyan);
+
+  --ring-track: rgba(46, 196, 182, 0.18);
+  --ring-fill: var(--accent-cyan);
+  --bar-track: #eceaf5;
+  --bar-fill: var(--accent-cyan);
+
+  --protein: var(--accent-cyan);
+  --carbs: var(--accent-yellow);
+  --fat: var(--accent-pink);
+
+  --shadow-card: 0 10px 28px rgba(26, 21, 72, 0.1);
+  --shadow-soft: 0 4px 16px rgba(26, 21, 72, 0.06);
+  --radius-card: 1.25rem;
+  --radius-btn: 9999px;
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 html,
@@ -25,7 +51,79 @@ body {
 }
 
 body {
-  background: var(--background);
+  background: var(--bg-deep);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Shared UI utilities */
+.ft-card {
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+
+.ft-card-soft {
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.ft-input {
+  width: 100%;
+  border-radius: 0.9rem;
+  background: var(--input-bg);
+  padding: 0.75rem 0.9rem;
+  outline: none;
+  border: 1px solid transparent;
+}
+
+.ft-input:focus {
+  border-color: rgba(139, 124, 246, 0.35);
+  background: #fff;
+}
+
+.ft-btn-primary {
+  width: 100%;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--accent-pink), #e85d96);
+  padding: 0.9rem 1rem;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(240, 115, 168, 0.35);
+}
+
+.ft-btn-primary:disabled {
+  opacity: 0.55;
+}
+
+.ft-btn-secondary {
+  width: 100%;
+  border-radius: 1rem;
+  background: rgba(139, 124, 246, 0.12);
+  padding: 0.9rem 1rem;
+  color: var(--accent-violet);
+  font-weight: 600;
+}
+
+.ft-page {
+  min-height: 100%;
+  background: var(--surface);
+}
+
+.ft-hero {
+  background: linear-gradient(
+    165deg,
+    var(--bg-deep) 0%,
+    var(--bg-deep-mid) 55%,
+    var(--bg-deep-soft) 100%
+  );
+  color: #fff;
+}
+
+.ft-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
 }

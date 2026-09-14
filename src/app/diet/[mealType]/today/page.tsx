@@ -48,61 +48,77 @@ export default function MealTodayPage() {
   const backHref = fromHistory ? `/history/${date}` : "/";
 
   return (
-    <div className="px-2">
+    <div className="ft-page px-2 pb-6">
       <PageHeader
         title={mealTypeLabel(mealType)}
         backHref={backHref}
         action={
           isToday ? (
-            <Link href={`/diet/${mealType}`} className="text-sm">
+            <Link
+              href={`/diet/${mealType}`}
+              className="rounded-full bg-[rgba(240,115,168,0.14)] px-3 py-1.5 text-sm font-semibold text-[var(--accent-pink)]"
+            >
               添加
             </Link>
           ) : null
         }
       />
 
-      <div className="px-2 pt-4">
+      <div className="px-3 pt-2">
         <p className="text-sm text-[var(--muted)]">{formatDateDisplay(date)}</p>
 
         {meals.length === 0 ? (
-          <p className="mt-8 text-sm text-[var(--muted)]">未记录</p>
+          <div className="ft-card mt-6 px-4 py-10 text-center">
+            <p className="text-sm text-[var(--muted)]">未记录</p>
+          </div>
         ) : (
           <>
-            <p className="mt-4 text-2xl font-semibold">
-              {roundNutrition(totals.calories)} kcal
-            </p>
-            <p className="mt-1 text-sm text-[var(--muted)]">
-              蛋白质 {roundNutrition(totals.protein)}g  碳水 {roundNutrition(totals.carbs)}g  脂肪{" "}
-              {roundNutrition(totals.fat)}g
-            </p>
+            <div className="ft-card mt-4 p-5">
+              <p className="ft-num text-3xl font-bold">
+                {roundNutrition(totals.calories)}
+                <span className="ml-1 text-sm font-medium text-[var(--accent-cyan)]">
+                  kcal
+                </span>
+              </p>
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                <span style={{ color: "var(--protein)" }}>P</span>{" "}
+                {roundNutrition(totals.protein)}g
+                <span className="mx-1.5">·</span>
+                <span style={{ color: "var(--carbs)" }}>C</span>{" "}
+                {roundNutrition(totals.carbs)}g
+                <span className="mx-1.5">·</span>
+                <span style={{ color: "var(--fat)" }}>F</span>{" "}
+                {roundNutrition(totals.fat)}g
+              </p>
+            </div>
 
-            <div className="mt-6 space-y-3">
+            <div className="mt-4 space-y-3">
               {meals.map((meal) => {
                 const mealTotals = sumFoods(meal.foods);
                 return (
-                  <article
-                    key={meal.id}
-                    className="rounded-xl border border-[var(--line)] p-4"
-                  >
+                  <article key={meal.id} className="ft-card-soft p-4">
                     <PhotoStrip photoIds={meal.photos} />
                     {meal.foods.map((food) => (
-                      <p key={food.id} className="text-sm">
+                      <p key={food.id} className="text-sm font-medium">
                         {food.nameZh}
                       </p>
                     ))}
-                    <p className="mt-2 text-sm">
-                      {roundNutrition(mealTotals.calories)} kcal
+                    <p className="ft-num mt-2 text-lg font-bold">
+                      {roundNutrition(mealTotals.calories)}
+                      <span className="ml-1 text-xs font-medium text-[var(--muted)]">
+                        kcal
+                      </span>
                     </p>
                     <div className="mt-3 flex gap-4 text-sm">
                       <Link
                         href={`/diet/${mealType}/manual/${meal.id}`}
-                        className="font-medium"
+                        className="font-semibold text-[var(--accent-violet)]"
                       >
                         编辑
                       </Link>
                       <button
                         type="button"
-                        className="text-red-600"
+                        className="font-medium text-[var(--accent-pink)]"
                         onClick={() => setDeleteId(meal.id)}
                       >
                         删除

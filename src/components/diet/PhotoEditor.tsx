@@ -73,12 +73,12 @@ export function PhotoEditor({ mealKey, onChange }: PhotoEditorProps) {
       <p className="text-sm text-[var(--muted)]">已选择 {items.length} 张照片</p>
       <div className="mt-3 grid grid-cols-2 gap-3">
         {items.map((item, index) => (
-          <div key={item.id} className="relative overflow-hidden rounded-xl border border-[var(--line)]">
+          <div key={item.id} className="relative overflow-hidden rounded-2xl shadow-[var(--shadow-soft)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={item.url} alt={`照片 ${index + 1}`} className="h-32 w-full object-cover" />
             <button
               type="button"
-              className="absolute right-2 top-2 rounded-full bg-black/60 px-2 text-white"
+              className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white"
               onClick={() => void remove(item.id)}
             >
               ×
@@ -105,26 +105,26 @@ export function PhotoEditor({ mealKey, onChange }: PhotoEditorProps) {
         onChange={(e) => void addFiles(e.target.files)}
       />
 
-      {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="mt-3 text-sm text-red-500">{error}</p> : null}
       {busy ? <p className="mt-3 text-sm text-[var(--muted)]">正在压缩图片…</p> : null}
 
       <button
         type="button"
-        className="mt-4 w-full py-2 text-sm"
+        className="mt-4 w-full py-2 text-sm font-medium text-[var(--accent-violet)]"
         onClick={() => albumRef.current?.click()}
       >
         ＋ 添加更多照片
       </button>
       <button
         type="button"
-        className="mt-2 w-full rounded-xl border border-[var(--line)] py-3"
+        className="mt-2 w-full rounded-[1rem] bg-[rgba(139,124,246,0.12)] py-3.5 font-semibold text-[var(--accent-violet)]"
         onClick={() => cameraRef.current?.click()}
       >
         拍摄照片
       </button>
       <button
         type="button"
-        className="mt-2 w-full rounded-xl border border-[var(--line)] py-3"
+        className="mt-2 w-full rounded-[1rem] bg-[rgba(46,196,182,0.12)] py-3.5 font-semibold text-[var(--accent-cyan)]"
         onClick={() => albumRef.current?.click()}
       >
         从相册选择

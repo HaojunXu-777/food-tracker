@@ -29,17 +29,19 @@ export default function ManualEditPage() {
   }
 
   if (meal === undefined) {
-    return <p className="px-4 pt-8 text-sm text-[var(--muted)]">加载中…</p>;
+    return (
+      <p className="ft-page px-4 pt-8 text-sm text-[var(--muted)]">加载中…</p>
+    );
   }
 
   if (meal === null || meal.mealType !== mealType) {
-    return <p className="px-4 pt-8 text-sm">记录不存在</p>;
+    return <p className="ft-page px-4 pt-8 text-sm">记录不存在</p>;
   }
 
   return (
-    <div>
+    <div className="ft-page">
       <PageHeader title="编辑" backHref={`/diet/${mealType}/today`} />
-      <p className="px-4 pt-2 text-sm text-[var(--muted)]">{mealTypeLabel(mealType)}</p>
+      <p className="px-4 pt-1 text-sm text-[var(--muted)]">{mealTypeLabel(mealType)}</p>
       <ManualMealForm
         mealType={mealType}
         mealId={meal.id}

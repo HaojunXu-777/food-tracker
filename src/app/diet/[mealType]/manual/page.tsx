@@ -14,9 +14,9 @@ export default function ManualAddPage() {
   }
 
   return (
-    <div>
+    <div className="ft-page">
       <PageHeader title="手动添加" backHref={`/diet/${mealType}`} />
-      <p className="px-4 pt-2 text-sm text-[var(--muted)]">{mealTypeLabel(mealType)}</p>
+      <p className="px-4 pt-1 text-sm text-[var(--muted)]">{mealTypeLabel(mealType)}</p>
       <ManualMealForm mealType={mealType} />
     </div>
   );

@@ -44,7 +44,7 @@ export function PhotoStrip({ photoIds }: PhotoStripProps) {
           <button
             key={item.id}
             type="button"
-            className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[var(--line)]"
+            className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl shadow-[var(--shadow-soft)]"
             onClick={() => setActive(item.url)}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

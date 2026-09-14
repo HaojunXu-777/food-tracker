@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   applicationName: "今日饮食",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "今日饮食",
   },
   formatDetection: {
@@ -30,7 +30,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
-  themeColor: "#111827",
+  themeColor: "#1a1548",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -7,6 +7,7 @@ type TrendChartProps = {
   points: Point[];
   fillEmptyWithZero: boolean;
   formatY?: (value: number) => string;
+  color?: string;
 };
 
 function niceMax(value: number): number {
@@ -21,6 +22,7 @@ export function TrendChart({
   points,
   fillEmptyWithZero,
   formatY = (value) => String(Math.round(value)),
+  color = "var(--accent-cyan)",
 }: TrendChartProps) {
   const width = 320;
   const height = 160;
@@ -68,13 +70,33 @@ export function TrendChart({
     .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
     .join(" ");
 
+  const areaPath =
+    linePoints.length > 0
+      ? `${path} L ${linePoints[linePoints.length - 1].x} ${padT + innerH} L ${linePoints[0].x} ${padT + innerH} Z`
+      : "";
+
   const ticks = [max, (max + min) / 2, min];
   const labelEvery = points.length > 10 ? Math.ceil(points.length / 7) : 1;
+  const gradId = `trend-${color.replace(/[^a-zA-Z0-9]/g, "")}`;
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-40 w-full" aria-hidden>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
       {ticks.map((tick) => (
         <g key={tick}>
+          <line
+            x1={padL}
+            x2={width - padR}
+            y1={yAt(tick)}
+            y2={yAt(tick)}
+            stroke="var(--line)"
+            strokeWidth="1"
+          />
           <text
             x={padL - 6}
             y={yAt(tick) + 3}
@@ -86,19 +108,12 @@ export function TrendChart({
           </text>
         </g>
       ))}
-      <line
-        x1={padL}
-        x2={width - padR}
-        y1={padT + innerH}
-        y2={padT + innerH}
-        stroke="var(--foreground)"
-        strokeWidth="1"
-      />
+      {areaPath ? <path d={areaPath} fill={`url(#${gradId})`} /> : null}
       {path ? (
-        <path d={path} fill="none" stroke="var(--accent)" strokeWidth="1.5" />
+        <path d={path} fill="none" stroke={color} strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
       ) : null}
       {linePoints.map((point) => (
-        <circle key={point.date} cx={point.x} cy={point.y} r="3" fill="var(--accent)" />
+        <circle key={point.date} cx={point.x} cy={point.y} r="3.5" fill={color} stroke="#fff" strokeWidth="1.5" />
       ))}
       {points.map((point, index) =>
         index % labelEvery === 0 || index === points.length - 1 ? (

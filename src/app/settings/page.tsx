@@ -109,76 +109,82 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="px-4 pt-6 pb-8">
-      <h1 className="text-center text-xl font-semibold">设置</h1>
+    <div className="ft-page px-4 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))]">
+      <h1 className="text-center text-xl font-bold tracking-tight">设置</h1>
 
-      <section className="mt-8">
-        <h2 className="mb-4 font-medium">每日目标</h2>
-        <div className="space-y-3">
+      <section className="ft-card mt-6 p-4">
+        <h2 className="font-semibold">每日目标</h2>
+        <p className="mt-1 text-xs text-[var(--muted)]">
+          可留空；首页圆环与进度条会据此显示
+        </p>
+        <div className="mt-4 space-y-3">
           <GoalField
             label="卡路里"
             unit="kcal"
+            accent="var(--accent-cyan)"
             value={draft.calories}
             onChange={(value) => updateField("calories", value)}
           />
           <GoalField
             label="蛋白质"
             unit="g"
+            accent="var(--protein)"
             value={draft.protein}
             onChange={(value) => updateField("protein", value)}
           />
           <GoalField
             label="碳水"
             unit="g"
+            accent="var(--carbs)"
             value={draft.carbs}
             onChange={(value) => updateField("carbs", value)}
           />
           <GoalField
             label="脂肪"
             unit="g"
+            accent="var(--fat)"
             value={draft.fat}
             onChange={(value) => updateField("fat", value)}
           />
         </div>
       </section>
 
-      <section className="mt-8 border-t border-[var(--line)] pt-6">
-        <h2 className="mb-4 font-medium">体重</h2>
-        <div className="flex items-center justify-between">
-          <span>单位</span>
-          <div className="flex gap-2">
-            <UnitButton
-              label="kg"
-              active={unit === "kg"}
-              onClick={() => saveWeightUnit("kg")}
-            />
-            <UnitButton
-              label="lb"
-              active={unit === "lb"}
-              onClick={() => saveWeightUnit("lb")}
-            />
-          </div>
+      <section className="ft-card mt-4 p-4">
+        <h2 className="font-semibold">体重单位</h2>
+        <p className="mt-1 text-xs text-[var(--muted)]">内部统一按 kg 存储</p>
+        <div className="mt-4 flex rounded-full bg-[var(--input-bg)] p-1">
+          <UnitButton
+            label="kg"
+            active={unit === "kg"}
+            onClick={() => saveWeightUnit("kg")}
+          />
+          <UnitButton
+            label="lb"
+            active={unit === "lb"}
+            onClick={() => saveWeightUnit("lb")}
+          />
         </div>
       </section>
 
-      <section className="mt-8 border-t border-[var(--line)] pt-6">
-        <h2 className="mb-4 font-medium">数据</h2>
-        <div className="space-y-2">
+      <section className="ft-card mt-4 p-4">
+        <h2 className="font-semibold">数据导出</h2>
+        <p className="mt-1 text-xs text-[var(--muted)]">
+          在浏览器本地下载 CSV，不会上传
+        </p>
+        <div className="mt-4 space-y-2.5">
           <button
             type="button"
-            className="flex w-full items-center justify-between rounded-xl border border-[var(--line)] px-4 py-3 text-left"
+            className="ft-btn-secondary"
             onClick={() => void exportMeals()}
           >
-            <span>导出饮食记录 CSV</span>
-            <span className="text-[var(--muted)]">&gt;</span>
+            导出饮食记录 CSV
           </button>
           <button
             type="button"
-            className="flex w-full items-center justify-between rounded-xl border border-[var(--line)] px-4 py-3 text-left"
+            className="w-full rounded-[1rem] bg-[rgba(240,115,168,0.12)] py-3.5 font-semibold text-[var(--accent-pink)]"
             onClick={() => void exportWeights()}
           >
-            <span>导出体重记录 CSV</span>
-            <span className="text-[var(--muted)]">&gt;</span>
+            导出体重记录 CSV
           </button>
         </div>
         {exportMessage ? (
@@ -194,18 +200,27 @@ function GoalField({
   unit,
   value,
   onChange,
+  accent,
 }: {
   label: string;
   unit: string;
   value: string;
   onChange: (value: string) => void;
+  accent: string;
 }) {
   return (
     <label className="flex items-center justify-between gap-3 text-sm">
-      <span>{label}</span>
+      <span className="flex items-center gap-2 font-medium">
+        <span
+          className="h-2.5 w-2.5 rounded-full"
+          style={{ background: accent }}
+          aria-hidden
+        />
+        {label}
+      </span>
       <span className="flex items-center gap-2">
         <input
-          className="w-24 rounded-lg border border-[var(--line)] px-3 py-2 text-right"
+          className="ft-input w-24 text-right font-semibold"
           inputMode="decimal"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -231,8 +246,8 @@ function UnitButton({
       onClick={onClick}
       className={
         active
-          ? "rounded-full bg-[var(--accent)] px-4 py-1.5 text-sm text-white"
-          : "rounded-full border border-[var(--line)] px-4 py-1.5 text-sm text-[var(--muted)]"
+          ? "flex-1 rounded-full bg-[var(--accent-violet)] py-2.5 text-sm font-semibold text-white"
+          : "flex-1 rounded-full py-2.5 text-sm font-medium text-[var(--muted)]"
       }
     >
       {label}

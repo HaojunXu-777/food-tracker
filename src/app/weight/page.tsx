@@ -48,28 +48,30 @@ export default function WeightPage() {
   }
 
   return (
-    <div className="px-2">
+    <div className="ft-page px-2 pb-6">
       <PageHeader title="今日体重" backHref="/" />
-      <div className="px-2 pt-6">
-        <label className="block text-sm">
-          体重（{unit}）
-          <input
-            className="mt-1 w-full rounded-lg border border-[var(--line)] px-3 py-2"
-            inputMode="decimal"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder={unit === "kg" ? "70.4" : "155.2"}
-          />
-        </label>
-        {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-        <button
-          type="button"
-          disabled={saving}
-          className="mt-6 w-full rounded-xl bg-[var(--accent)] py-3 text-white disabled:opacity-60"
-          onClick={handleSave}
-        >
-          {saving ? "保存中…" : "保存"}
-        </button>
+      <div className="px-3 pt-4">
+        <div className="ft-card p-5">
+          <label className="block text-sm font-medium">
+            体重（{unit}）
+            <input
+              className="ft-input mt-2 text-center text-3xl font-bold tracking-tight"
+              inputMode="decimal"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder={unit === "kg" ? "70.4" : "155.2"}
+            />
+          </label>
+          {error ? <p className="mt-3 text-sm text-red-500">{error}</p> : null}
+          <button
+            type="button"
+            disabled={saving}
+            className="ft-btn-primary mt-6"
+            onClick={handleSave}
+          >
+            {saving ? "保存中…" : "保存"}
+          </button>
+        </div>
       </div>
     </div>
   );
